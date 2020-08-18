@@ -114,11 +114,21 @@ if __name__ == '__main__':
         df= build_df(inst["name"], params_hf, PERIOD)
 
         indicator_macd = MACD(close=df['close'], n_slow=21, n_fast=9, n_sign=8, fillna=False)
+        
         df['macd_dif'] = indicator_macd.macd_diff()
+        df['ema_short'] = df['open'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
+        df['ema_long'] = df['open'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
+
+        
         if df['macd_dif'].iloc[-1]>0 and df['macd_dif'].iloc[-2]<0:
-            stats+="+++" + inst["name"]+"\n"
+            stats+="MAC +++" + inst["name"]+"\n"
         elif df['macd_dif'].iloc[-1]<0 and df['macd_dif'].iloc[-2]>0:
-            stats+="---" + inst["name"]+"\n"
+            stats+="MAC ---" + inst["name"]+"\n"
+
+        if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
+            stats+="EMA +++ " + inst["name"] +"\n"
+        elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
+            stats+="EMA --- " + inst["name"] +"\n"
     
         print(stats)
         time.sleep(5)
