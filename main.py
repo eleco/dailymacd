@@ -115,8 +115,8 @@ if __name__ == '__main__':
         df= build_df(inst["name"], params_hf, PERIOD)
 
         indicator_macd = MACD(close=df['close'], n_slow=21, n_fast=9, n_sign=8, fillna=False)
-        indicator_donchian_h = donchian_channel_hband
-        indicator_donchian_l = donchian_channel_lband
+        indicator_donchian_h = donchian_channel_hband()
+        indicator_donchian_l = donchian_channel_lband()
         
         df['macd_dif'] = indicator_macd.macd_diff()
         df['ema_short'] = df['open'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
