@@ -126,7 +126,7 @@ if __name__ == '__main__':
         df['donchian_l'] = indicator_donchian_l
         
 
-        if df['close'].iloc[-1] <= df['donchian_h'].iloc[-1]:
+        if df['close'].iloc[-1] >= df['donchian_h'].iloc[-1]:
             stats+="DC +++" + inst["name"]+"\n"
 
         if df['close'].iloc[-1] <= df['donchian_l'].iloc[-1]:
