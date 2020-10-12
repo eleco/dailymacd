@@ -18,6 +18,7 @@ import oandapyV20.endpoints.accounts as accounts
 
 from ta.trend import MACD
 
+from ta.volatility import   donchian_channel_hband, donchian_channel_lband
 
 PERIOD="D"
 dict_hf={}
@@ -114,21 +115,32 @@ if __name__ == '__main__':
         df= build_df(inst["name"], params_hf, PERIOD)
 
         indicator_macd = MACD(close=df['close'], n_slow=21, n_fast=9, n_sign=8, fillna=False)
+        indicator_donchian_h = donchian_channel_hband
+        indicator_donchian_l = donchian_channel_lband
         
         df['macd_dif'] = indicator_macd.macd_diff()
         df['ema_short'] = df['open'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
         df['ema_long'] = df['open'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
-
+        df['donchian_h'] = indicator_donchian_h
+        df['donchian_l'] = indicator_donchian_l
         
-        if df['macd_dif'].iloc[-1]>0 and df['macd_dif'].iloc[-2]<0:
-            stats+="MAC +++" + inst["name"]+"\n"
-        elif df['macd_dif'].iloc[-1]<0 and df['macd_dif'].iloc[-2]>0:
-            stats+="MAC ---" + inst["name"]+"\n"
 
-        if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
-            stats+="EMA +++ " + inst["name"] +"\n"
-        elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
-            stats+="EMA --- " + inst["name"] +"\n"
+        if df['close'].iloc[-1] <= df['donchian_h'].iloc(-1):
+            stats+="DC +++" + inst["name"]+"\n"
+
+        if df['close'].iloc[-1] <= df['donchian_l'].iloc(-1):
+            stats+="DC ---" + inst["name"]+"\n"
+            
+        
+        #if df['macd_dif'].iloc[-1]>0 and df['macd_dif'].iloc[-2]<0:
+        #    stats+="MAC +++" + inst["name"]+"\n"
+        #elif df['macd_dif'].iloc[-1]<0 and df['macd_dif'].iloc[-2]>0:
+        #    stats+="MAC ---" + inst["name"]+"\n"
+
+        #if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
+        #    stats+="EMA +++ " + inst["name"] +"\n"
+        #elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
+        #stats+="EMA --- " + inst["name"] +"\n"
     
         print(stats)
         time.sleep(5)
