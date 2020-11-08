@@ -7,8 +7,8 @@ import datetime
 import os
 import logging
 import ta
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Content
+import requests
+
 
 import v20
 from oandapyV20 import API
@@ -19,6 +19,12 @@ import oandapyV20.endpoints.accounts as accounts
 from ta.trend import MACD
 
 from ta.volatility import  DonchianChannel
+
+#mailgun settings
+mailgun_key = os.environ.get('MAILGUN_KEY')
+mailgun_sandbox= os.environ.get('MAILGUN_SANDBOX')
+to_email= os.environ.get('MAILGUN_RECIPIENT')
+
 
 PERIOD="D"
 dict_hf={}
@@ -32,23 +38,23 @@ access_token = os.environ.get('OANDA_ACCESS_TOKEN')
 client = API(access_token=access_token, environment="live",request_params={'timeout': 30})
 api = v20.Context('api-fxtrade.oanda.com','443',token=access_token)
 account_id = os.environ.get('OANDA_ACCOUNT_ID')
-sendgrid_key = os.environ.get('SENDGRID_KEY')
-sg = SendGridAPIClient(sendgrid_key)
 
 
 def send_email(subject, content):
+    try:
+            request_url = 'https://api.mailgun.net/v2/{0}/messages'.format(mailgun_sandbox)
+            request = requests.post(request_url, auth=('api', mailgun_key), data={
+                'from': 'dailymacd@test.com',
+                'to': to_email,
+                'subject':'daily macd ' + "@" + str(datetime.datetime.today()),
+                'text': str(content)
+            })
 
-    try:   
-       mail = Mail(from_email='dailymacd@test.com',
-                subject=subject + "@" + str(datetime.datetime.today()), 
-                to_emails= 'eric@leconte.me',
-                plain_text_content=str(content))
-
-       logging.info(str(content))
-       response=sg.send(mail)
-
+            print ('Status: {0}'.format(request.status_code))
+            print ('Body:   {0}'.format(request.text))
     except Exception as e:
-       logging.error("error sending email:" + str(e))
+        print('An error occurred: ',e)
+
 
 
 def fetch_candles_from ( instr, params):
