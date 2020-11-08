@@ -126,8 +126,8 @@ if __name__ == '__main__':
         indicator_donchian_l = indicator_dc.donchian_channel_lband()
         
         df['macd_dif'] = indicator_macd.macd_diff()
-        df['ema_short'] = df['open'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
-        df['ema_long'] = df['open'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
+        df['ema_short'] = df['open'].ewm(span=100,min_periods=0,adjust=False,ignore_na=False).mean()
+        df['ema_long'] = df['open'].ewm(span=100,min_periods=0,adjust=False,ignore_na=False).mean()
         df['donchian_h'] = indicator_donchian_h
         df['donchian_l'] = indicator_donchian_l
         
@@ -144,10 +144,10 @@ if __name__ == '__main__':
         #elif df['macd_dif'].iloc[-1]<0 and df['macd_dif'].iloc[-2]>0:
         #    stats+="MAC ---" + inst["name"]+"\n"
 
-        #if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
-        #    stats+="EMA +++ " + inst["name"] +"\n"
-        #elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
-        #stats+="EMA --- " + inst["name"] +"\n"
+        if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
+            stats+="EMA +++ " + inst["name"] +"\n"
+        elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
+        stats+="EMA --- " + inst["name"] +"\n"
     
         print(stats)
         time.sleep(5)
