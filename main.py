@@ -147,7 +147,7 @@ if __name__ == '__main__':
         if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
             stats+="EMA +++ " + inst["name"] +"\n"
         elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
-        stats+="EMA --- " + inst["name"] +"\n"
+            stats+="EMA --- " + inst["name"] +"\n"
     
         print(stats)
         time.sleep(5)
