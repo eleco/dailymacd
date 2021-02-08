@@ -137,10 +137,10 @@ if __name__ == '__main__':
         df['ewm50'] = df['close'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
 
         if ( df['ewm10'].iloc[-1] < df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] < df['ewm50'].iloc[-1] ):
-            statsema+=("DOWN TREND: "+inst["name"])
+            statsema+=("DOWN TREND: "+inst["name"])+"\n"
 
         if ( df['ewm10'].iloc[-1] > df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] > df['ewm50'].iloc[-1] ):
-            statsema+=("UP TREND: "+ inst["name"])
+            statsema+=("UP TREND: "+ inst["name"])+"\n"
 
         if df['close'].iloc[-1] >= df['donchian_h'].iloc[-1]:
             statsdc+="DC +++" + inst["name"]+"\n"
