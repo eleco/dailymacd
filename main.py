@@ -113,7 +113,8 @@ if __name__ == '__main__':
     r = accounts.AccountInstruments(accountID=account_id)
     resp = client.request(r)
     instruments = resp["instruments"]
-    stats=""
+    statsdc=""
+    statsema=""
 
     for inst in instruments:
 
@@ -130,30 +131,31 @@ if __name__ == '__main__':
         df['ema_long'] = df['open'].ewm(span=100,min_periods=0,adjust=False,ignore_na=False).mean()
         df['donchian_h'] = indicator_donchian_h
         df['donchian_l'] = indicator_donchian_l
-        
+
+        df['ewm10'] = df['close'].ewm(span=10,min_periods=0,adjust=False,ignore_na=False).mean()
+        df['ewm20'] = df['close'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
+        df['ewm50'] = df['close'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
+
+        if ( df['ewm10'].iloc[-1] < df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] < df['ewm50'].iloc[-1] ):
+            statsema+=("DOWN TREND: ", inst["name"])
+
+        if ( df['ewm10'].iloc[-1] > df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] > df['ewm50'].iloc[-1] ):
+            statsema+=("UP TREND: ", inst["name"])
 
         if df['close'].iloc[-1] >= df['donchian_h'].iloc[-1]:
-            stats+="DC +++" + inst["name"]+"\n"
+            statsdc+="DC +++" + inst["name"]+"\n"
 
         if df['close'].iloc[-1] <= df['donchian_l'].iloc[-1]:
-            stats+="DC ---" + inst["name"]+"\n"
-            
-        
-        #if df['macd_dif'].iloc[-1]>0 and df['macd_dif'].iloc[-2]<0:
-        #    stats+="MAC +++" + inst["name"]+"\n"
-        #elif df['macd_dif'].iloc[-1]<0 and df['macd_dif'].iloc[-2]>0:
-        #    stats+="MAC ---" + inst["name"]+"\n"
+            statsdc+="DC ---" + inst["name"]+"\n"
 
-        if (df['close'].iloc[-1]>df['ema_short'].iloc[-1] and df['close'].iloc[-2]<df['ema_short'].iloc[-2]):
-            stats+="EMA +++ " + inst["name"] +"\n"
-        elif (df['close'].iloc[-1]<df['ema_short'].iloc[-1] and df['close'].iloc[-2]>df['ema_short'].iloc[-2]):
-            stats+="EMA --- " + inst["name"] +"\n"
     
-        print(stats)
+        print(statsema)
+        print(statsdc)
         time.sleep(5)
 
-    send_email("daily macd", stats)
-    print(stats)
+    send_email("daily macd dc", statsdc)
+    send_email("daily macd trend", statsema)
 
+    
 
 
