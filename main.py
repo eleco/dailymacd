@@ -46,7 +46,7 @@ def send_email(subject, content):
             request = requests.post(request_url, auth=('api', mailgun_key), data={
                 'from': 'dailymacd@test.com',
                 'to': to_email,
-                'subject':'daily macd ' + "@" + str(datetime.datetime.today()),
+                'subject':subject + "@" + str(datetime.datetime.today()),
                 'text': str(content)
             })
 
@@ -115,6 +115,7 @@ if __name__ == '__main__':
     instruments = resp["instruments"]
     statsdc=""
     statsema=""
+    statsminmax=""
 
     for inst in instruments:
 
@@ -136,6 +137,16 @@ if __name__ == '__main__':
         df['ewm20'] = df['close'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
         df['ewm50'] = df['close'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
 
+        df['max20'] = df['close'].rolling(5).max()
+        df['min20'] = df['close'].rolling(5).min()
+        print(df)
+        
+        if (df['max20'].iloc[-1]< df['close'].iloc[-1]):
+            statsminmax+=" MAX BREAKOUT: "+inst["name"]+"\n"
+
+        if (df['min20'].iloc[-1]> df['close'].iloc[-1]):
+            statsminmax+=" MIN BREAKOUT: "+inst["name"]+"\n"
+
         if ( df['ewm10'].iloc[-1] < df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] < df['ewm50'].iloc[-1] ):
             statsema+=("DOWN TREND: "+inst["name"])+"\n"
 
@@ -151,10 +162,13 @@ if __name__ == '__main__':
     
         print(statsema)
         print(statsdc)
+        print(statsminmax)
         time.sleep(5)
 
     send_email("daily macd dc", statsdc)
     send_email("daily macd trend", statsema)
+    send_email("daily macd minmax", statsminmax)
+    
 
     
 
