@@ -137,8 +137,8 @@ if __name__ == '__main__':
         df['ewm20'] = df['close'].ewm(span=20,min_periods=0,adjust=False,ignore_na=False).mean()
         df['ewm50'] = df['close'].ewm(span=50,min_periods=0,adjust=False,ignore_na=False).mean()
 
-        df['max20'] = df['close'].rolling(5).max()
-        df['min20'] = df['close'].rolling(5).min()
+        df['max20'] = df['close'].rolling(20).max()
+        df['min20'] = df['close'].rolling(20).min()
         print(df)
         
         if (df['max20'].iloc[-1]<= df['close'].iloc[-1]):
