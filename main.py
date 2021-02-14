@@ -141,16 +141,18 @@ if __name__ == '__main__':
         df['min20'] = df['close'].rolling(20).min()
         print(df)
         
-        if (df['max20'].iloc[-1]<= df['close'].iloc[-1]):
+        if (df['max20'].iloc[-1]<= df['close'].iloc[-1]) and (df['max20'].iloc[-1]> df['close'].iloc[-2]):
             statsminmax+=" MAX BREAKOUT: "+inst["name"]+"\n"
 
-        if (df['min20'].iloc[-1]>= df['close'].iloc[-1]):
+        if (df['min20'].iloc[-1]>= df['close'].iloc[-1]) and (df['min20'].iloc[-1]< df['close'].iloc[-2])  :
             statsminmax+=" MIN BREAKOUT: "+inst["name"]+"\n"
 
-        if ( df['ewm10'].iloc[-1] < df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] < df['ewm50'].iloc[-1] ):
+        if ( (df['ewm10'].iloc[-1] < df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] < df['ewm50'].iloc[-1] )) \
+        and (  df['ewm10'].iloc[-2] > df['ewm20'].iloc[-2] or df['ewm20'].iloc[-2] > df['ewm50'].iloc[-2]):       
             statsema+=("DOWN TREND: "+inst["name"])+"\n"
 
-        if ( df['ewm10'].iloc[-1] > df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] > df['ewm50'].iloc[-1] ):
+        if (( df['ewm10'].iloc[-1] > df['ewm20'].iloc[-1] ) and ( df['ewm20'].iloc[-1] > df['ewm50'].iloc[-1] )) \
+        and (  df['ewm10'].iloc[-2] < df['ewm20'].iloc[-2] or df['ewm20'].iloc[-2] < df['ewm50'].iloc[-2]):       
             statsema+=("UP TREND: "+ inst["name"])+"\n"
 
         if df['close'].iloc[-1] >= df['donchian_h'].iloc[-1]:
